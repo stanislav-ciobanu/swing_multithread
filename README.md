@@ -1,77 +1,79 @@
-# 🌬️ Moara de Vânt — Animație Java Swing Multi-Thread
+# 🌬️ Windmill — Java Swing Multi-Thread Animation
 
-**Lucrare individuală** · Programarea Concurentă și Distribuită · CR-221FR  
-**Student:** Ciobanu Stanislav · **Conducător:** asist. univ. Rotaru Lilia
+**Individual Assignment** · Concurrent and Distributed Programming · CR-221FR  
+**Student:** Ciobanu Stanislav · **Supervisor:** Assist. Prof. Rotaru Lilia
 
 ---
 
-## Descriere
+## Description
 
-Aplicație grafică Java Swing care animează o moară de vânt folosind **trei thread-uri concurente** ce comunică între ele prin mecanismul `Exchanger<Color>`. Proiectul demonstrează sincronizarea între thread-uri, detectarea evenimentelor unghiulare și propagarea stării (culoare) dintr-un thread în altul fără blocare explicită cu `synchronized`.
+Java Swing graphical application that animates a windmill using **three concurrent threads** that communicate via the `Exchanger<Color>` mechanism.  
 
-Ideea scenei: morile de vânt reflectă lumina solară când o pală trece prin poziția „ora 12". Culoarea reflexiei este preluată direct de la soare prin `Exchanger` — soarele alternează între galben și portocaliu la fiecare 2 rotații complete, imitând trecerea dimineții în zi.
+The project demonstrates thread synchronization, angular event detection, and state propagation (color) between threads without explicit locking using `synchronized`.
+
+Scene concept: windmill blades reflect sunlight when passing through the “12 o’clock” position. The reflection color is taken directly from the sun via `Exchanger` — the sun alternates between yellow and orange every 2 full rotations, simulating the transition from morning to daytime.
 
 ---
 
 ## Demo
 
-### Pale în stare normală (gri)
+### Blades in normal state (gray)
 
-![Pale gri](screen1_pale_gri.png)
+![Gray blades](screen1_pale_gri.png)
 
-Palele se rotesc continuu. Soarele este galben. Palele au culoarea implicită gri.
-
----
-
-### Reflexie activă — pala preia culoarea soarelui
-
-![Pală galbenă](screen2_pala_galbena.png)
-
-La trecerea prin „ora 12", pala detectată prin thread-ul `reflexie` inițiază un `exchanger.exchange(null)` și primește culoarea curentă a soarelui (galben). Culoarea este păstrată 500ms, apoi pala revine la gri.
+The blades rotate continuously. The sun is yellow. The blades have the default gray color.
 
 ---
 
-### Reflexie cu soare galben — unghi diferit
+### Active reflection — blade takes the sun’s color
 
-![Pală galbenă 2](screen3_pala_galbena2.png)
+![Yellow blade](screen2_pala_galbena.png)
 
-Același mecanism, capturat la un unghi de rotație diferit. Demonstrează că reflexia funcționează corect pentru fiecare sub-pală independent.
+When passing the “12 o’clock” position, the blade detected by the `reflection` thread initiates an `exchanger.exchange(null)` and receives the current sun color (yellow). The color is kept for 500ms, then the blade returns to gray.
 
 ---
 
-## Structura clasei
+### Reflection with yellow sun — different angle
+
+![Yellow blade 2](screen3_pala_galbena2.png)
+
+Same mechanism, captured at a different rotation angle. Demonstrates that reflection works correctly for each sub-blade independently.
+
+---
+
+## Class Structure
 
 ```
-MoaraDeVant (extends JPanel)
+Windmill (extends JPanel)
 │
-├── unghi          — unghiul curent de rotație (double)
-├── pale = 2       — numărul de pale principale
-├── subPale = 4    — pale * 2 (segmente desenate)
-├── exchanger      — Exchanger<Color>
-├── culoareSoare   — volatile Color (YELLOW / ORANGE)
-└── culoarePale[]  — culoarea fiecărei sub-pale
+├── angle — current rotation angle (double)
+├── blades = 2 — number of main blades
+├── subBlades = 4 — blades * 2 (rendered segments)
+├── exchanger — Exchanger<Color>
+├── sunColor — volatile Color (YELLOW / ORANGE)
+└── bladeColors[] — color of each sub-blade
 │
-├── Thread: rotire        — rotație + schimbare culoare soare
-├── Thread: reflexie      — detecție „ora 12" + exchange
-└── Thread: threadExchange — furnizor de culoare
+├── Thread: rotation — rotation + sun color change
+├── Thread: reflection — “12 o’clock” detection + exchange
+└── Thread: exchangeThread — color provider
 │
-├── paintComponent()      — entry point Swing
-├── deseneazaFundal()     — cer, soare, iarbă, corp moară
-└── deseneazaMoara()      — hub + pale cu AffineTransform
+├── paintComponent() — Swing entry point
+├── drawBackground() — sky, sun, grass, windmill body
+└── drawWindmill() — hub + blades with AffineTransform
 ```
 
 ---
 
-## Concepte demonstrate
+## Concepts Demonstrated
 
-| Concept | Utilizare în proiect |
+| Concept | Usage in Project |
 |---|---|
-| `Exchanger<T>` | Schimb de culoare între thread-ul reflexiei și cel al soarelui |
-| `volatile` | Vizibilitate garantată a `unghi` și `culoareSoare` între thread-uri |
-| Thread daemon | Thread-urile se opresc automat la închiderea ferestrei |
-| `AffineTransform` | Rotații independente pentru fiecare pală în Swing |
-| `repaint()` | Redesenare asincronă din thread non-EDT |
+| `Exchanger<T>` | Color exchange between reflection thread and sun thread |
+| `volatile` | Guaranteed visibility of `angle` and `sunColor` across threads |
+| Daemon threads | Threads automatically stop when the window is closed |
+| `AffineTransform` | Independent rotation for each blade in Swing |
+| `repaint()` | Asynchronous rendering from non-EDT threads |
 
 ---
 
-> **Universitatea Tehnică a Moldovei** · FCIM · Programarea Concurentă și Distribuită · 2025
+> **Technical University of Moldova** · FCIM · Concurrent and Distributed Programming · 2025
