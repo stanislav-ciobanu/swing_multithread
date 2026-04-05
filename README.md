@@ -39,48 +39,6 @@ Același mecanism, capturat la un unghi de rotație diferit. Demonstrează că r
 
 ---
 
-## Arhitectura thread-urilor
-
-```
-┌─────────────────────────────────────────────────────────────┐
-│                     Thread: rotire                          │
-│  • Incrementează unghiul cu 2° la fiecare 50ms             │
-│  • Schimbă culoarea soarelui (YELLOW↔ORANGE) la 2 rotații  │
-│  • Apelează repaint()                                       │
-└──────────────────────────┬──────────────────────────────────┘
-                           │  unghi (volatile)
-┌──────────────────────────▼──────────────────────────────────┐
-│                     Thread: reflexie                        │
-│  • Monitorizează fiecare sub-pală la 20ms                  │
-│  • Detectează trecerea prin „ora 12" (unghi ~0°)           │
-│  • Pornește un sub-thread → exchanger.exchange(null)        │
-└──────────────────────────┬──────────────────────────────────┘
-                           │  Exchanger<Color>
-┌──────────────────────────▼──────────────────────────────────┐
-│                  Thread: threadExchange                     │
-│  • Răspunde instant cu culoarea curentă a soarelui         │
-│  • exchanger.exchange(culoareSoare) în buclă               │
-└─────────────────────────────────────────────────────────────┘
-```
-
----
-
-## Cum funcționează `Exchanger`
-
-`Exchanger<Color>` este un punct de sincronizare între două thread-uri: primul care ajunge la `exchange()` se blochează și **așteaptă** al doilea. Când ambele ajung, **fac schimb de valori** și continuă execuția.
-
-```
-Thread reflexie (sub-pală)          Thread threadExchange
-        │                                   │
-        │  exchanger.exchange(null)  ◄──►   │  exchanger.exchange(culoareSoare)
-        │                                   │
-  primește Color (galben/portocaliu)   primește null
-  → aplică pe pală 500ms
-  → revine la Color.GRAY
-```
-
----
-
 ## Structura clasei
 
 ```
@@ -101,40 +59,6 @@ MoaraDeVant (extends JPanel)
 ├── deseneazaFundal()     — cer, soare, iarbă, corp moară
 └── deseneazaMoara()      — hub + pale cu AffineTransform
 ```
-
----
-
-## Publicarea pe GitHub
-
-### Inițializare repozitoriu și push
-
-![Git terminal](screen4_git_terminal.png)
-
-```bash
-git init
-git add .
-git commit -m "Lucrare individuala PCD"
-git branch -M main
-git remote add origin https://github.com/shiprinski95/LucrIndivPCD.git
-git push -u origin main
-```
-
----
-
-### Repozitoriu pe GitHub
-
-![GitHub repo](screen5_github.png)
-
----
-
-## Pornire rapidă
-
-```bash
-javac LucrIndiv.java
-java MoaraDeVant
-```
-
-> Cerințe: Java 8+ · Nicio dependență externă
 
 ---
 
